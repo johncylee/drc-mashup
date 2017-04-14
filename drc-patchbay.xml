@@ -1,0 +1,34 @@
+<!DOCTYPE patchbay>
+<patchbay version="0.4.2" name="drc-patchbay">
+ <output-sockets>
+  <socket client="PulseAudio JACK Sink" exclusive="off" name="PulseAudio JACK Sink" type="jack-audio">
+   <plug>front-left</plug>
+   <plug>front-right</plug>
+  </socket>
+  <socket client="audacious" exclusive="off" name="audacious" type="jack-audio">
+   <plug>out_0</plug>
+   <plug>out_1</plug>
+  </socket>
+  <socket client="jconvolver" exclusive="off" name="jconvolver" type="jack-audio">
+   <plug>out\.L</plug>
+   <plug>out\.R</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket client="system" exclusive="off" name="system" type="jack-audio">
+   <plug>playback_1</plug>
+   <plug>playback_2</plug>
+  </socket>
+  <socket client="jconvolver" exclusive="off" name="jconvolver" type="jack-audio">
+   <plug>in\.L</plug>
+   <plug>in\.R</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable type="jack-audio" output="PulseAudio JACK Sink" input="jconvolver"/>
+  <cable type="jack-audio" output="audacious" input="jconvolver"/>
+  <cable type="jack-audio" output="jconvolver" input="system"/>
+ </cables>
+</patchbay>
+
