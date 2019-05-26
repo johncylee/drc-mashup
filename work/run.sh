@@ -5,13 +5,13 @@ set -e
 INDEV="hw:1,0"
 OUTDEV="hw:2,0"
 MIC_SAMPLE_RATE="48000"
+TARGET_RATE="44100"
 MIC_CALIBRATION="flat.txt"
 IMPULSE=impulse-${MIC_SAMPLE_RATE}.pcm
 
 run () {
-    local TARGET_RATE="$1"
-    local CONFIG="$2"
-    local PSPointsFile="$3"
+    local CONFIG="$1"
+    local PSPointsFile="$2"
     local BCInFile=impulse-${TARGET_RATE}.pcm
     local PSOutFile=$(basename "$CONFIG")
     PSOutFile="${PSOutFile%.drc}"
@@ -34,9 +34,14 @@ run () {
     echo "Generated ../${PSOutFile}.wav"
 }
 
+run_all_conf () {
+    KHZ=$(printf '%2.1f' "$((${TARGET_RATE}))e-3")
+    for conf in erb minimal soft normal strong extreme insane; do
+        run "${DRC_BASE}/config/${KHZ} kHz/${conf}-${KHZ}.drc" \
+            "${DRC_BASE}/target/${KHZ} kHz/pa-${KHZ}.txt"
+    done
+}
+
 DRC_BASE="/usr/share/drc"
-./measure-noref 24 $MIC_SAMPLE_RATE 10 21000 45 2 $INDEV $OUTDEV $IMPULSE
-run 44100 "${DRC_BASE}/config/44.1 kHz/erb-44.1.drc" "${DRC_BASE}/target/44.1 kHz/pa-44.1.txt"
-run 44100 "${DRC_BASE}/config/44.1 kHz/normal-44.1.drc" "${DRC_BASE}/target/44.1 kHz/pa-44.1.txt"
-run 48000 "${DRC_BASE}/config/48.0 kHz/erb-48.0.drc" "${DRC_BASE}/target/48.0 kHz/pa-48.0.txt"
-run 48000 "${DRC_BASE}/config/48.0 kHz/normal-48.0.drc" "${DRC_BASE}/target/48.0 kHz/pa-48.0.txt"
+./measure-noref 24 $MIC_SAMPLE_RATE 10 21000 45 2 $INDEV $OUTDEV $IMPULSE msrecsweep.wav
+run_all_conf
